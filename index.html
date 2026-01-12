@@ -160,6 +160,64 @@ footer {
 @media (max-width: 700px) {
   header h1 { font-size: 2.5rem; }
 }
+.glass-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.65),
+    rgba(230, 230, 230, 0.45)
+  );
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #2b2b2b;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  transition:
+    background 0.25s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+/* Hover */
+.glass-btn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8),
+    rgba(240, 240, 240, 0.6)
+  );
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Active (click) */
+.glass-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.18),
+    inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Disabled */
+.glass-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 </style>
 </head>
 
@@ -231,7 +289,7 @@ function render(list) {
         <h3>${s.i} ${s.n} <span class="badge">${s.v}</span></h3>
         <p>${s.d}</p>
         <div class="card-actions">
-          <a href="${s.n}" download>Download</a>
+          <a href="${s.n}" download class="glass-btn">Download</a>
           <button onclick="copy('chmod +x ${s.n}')">chmod</button>
           <button onclick="copy('./${s.n}')">run</button>
         </div>
