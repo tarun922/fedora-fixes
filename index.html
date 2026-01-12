@@ -1,289 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fedora Fixes | System Optimization Portal</title>
-    <!-- Inter Font for a modern, high-end look -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f0f2f5;
-            --fedora-blue: #51a2da;
-            --fedora-dark: #294172;
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-main: #1a1c22;
-            --text-muted: #64748b;
-            --sidebar-width: 280px;
-        }
+<meta charset="UTF-8">
+<title>Fedora Fixes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+<style>
+:root{
+  --bg:#0b0b12; --panel:#11111b; --txt:#eaeaf0; --accent:#6cf2c2; --accent2:#3cc1ff;
+}
+.light{
+  --bg:#f5f7fb; --panel:#ffffff; --txt:#111; --accent:#0ea5a4; --accent2:#2563eb;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,system-ui;background:var(--bg);color:var(--txt);display:flex}
 
-        body {
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(81, 162, 218, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(255, 255, 255, 0.8) 0px, transparent 50%);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-        }
+/* SIDEBAR */
+.sidebar{
+  width:300px;background:var(--panel);border-right:1px solid #2a2a40;
+  padding:1rem;height:100vh;overflow:auto;transition:.3s
+}
+.sidebar.hidden{transform:translateX(-100%)}
+.topbar{display:flex;gap:.5rem;align-items:center}
+.btn{
+  border:none;border-radius:999px;padding:.35rem .7rem;font-size:.75rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#000;font-weight:700;cursor:pointer
+}
+.btn.alt{background:#2a2a40;color:var(--txt)}
+.search{width:100%;margin:.6rem 0;padding:.45rem;border-radius:6px;border:none;background:#1c1c2b;color:var(--txt)}
+.file{background:rgba(255,255,255,.05);padding:.55rem;border-radius:8px;margin-bottom:.45rem}
+.name{color:var(--accent);font-weight:700;font-size:.85rem}
+.desc{font-size:.72rem;opacity:.8;margin:.2rem 0}
+.row{display:flex;gap:.3rem;flex-wrap:wrap}
 
-        /* --- BACKGROUND BLOBS FOR DEPTH --- */
-        .ambient-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            z-index: -1;
-            opacity: 0.5;
-        }
-        .blob-1 { top: -100px; right: -100px; width: 500px; height: 500px; background: #d1d9e6; }
-        .blob-2 { bottom: -100px; left: -100px; width: 600px; height: 600px; background: #cbd5e1; }
+/* MAIN */
+.main{flex:1;padding:2rem}
+h1{color:var(--accent);font-size:3rem;margin:.2rem 0}
+.term{
+  background:#000;border-radius:10px;padding:1rem;margin:1rem 0;
+  font-family:monospace;color:#39ff14;min-height:90px
+}
+.filters button{margin:.2rem}
 
-        /* --- SIDEBAR --- */
-        aside {
-            width: var(--sidebar-width);
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--glass-border);
-            padding: 40px 24px;
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
-        }
-
-        .brand {
-            font-weight: 800;
-            font-size: 1.4rem;
-            color: var(--fedora-blue);
-            letter-spacing: -0.5px;
-            margin-bottom: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-group { margin-bottom: 30px; }
-        .nav-label {
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .nav-item {
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255, 255, 255, 0.6);
-            color: var(--fedora-blue);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        /* --- MAIN CONTENT AREA --- */
-        main {
-            margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
-            padding: 40px 60px;
-            max-width: 1400px;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
-            padding: 40px;
-            margin-bottom: 30px;
-        }
-
-        header h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -1.5px;
-        }
-
-        header p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            max-width: 700px;
-        }
-
-        /* --- CONTENT GRID --- */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.4);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover { transform: translateY(-5px); }
-
-        .card h3 { margin-bottom: 15px; font-size: 1.2rem; }
-
-        .code-box {
-            background: #1e1e1e;
-            color: #dcdcdc;
-            padding: 15px;
-            border-radius: 12px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.85rem;
-            margin: 15px 0;
-            overflow-x: auto;
-            border: 1px solid #333;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(81, 162, 218, 0.1);
-            color: var(--fedora-blue);
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .btn-primary {
-            background: var(--fedora-blue);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 8px 20px rgba(81, 162, 218, 0.3);
-            filter: brightness(1.1);
-        }
-
-        /* --- SCROLLBAR --- */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        @media (max-width: 1024px) {
-            aside { width: 80px; padding: 40px 15px; }
-            .brand span, .nav-label, .nav-item span { display: none; }
-            main { margin-left: 80px; width: calc(100% - 80px); padding: 30px; }
-        }
-    </style>
+/* MOBILE */
+@media(max-width:900px){
+  .sidebar{position:fixed;z-index:10}
+  .mobileTop{display:flex;gap:.5rem;margin-bottom:.5rem}
+}
+</style>
 </head>
+
 <body>
 
-    <div class="ambient-blob blob-1"></div>
-    <div class="ambient-blob blob-2"></div>
+<!-- SIDEBAR -->
+<div class="sidebar hidden" id="sidebar">
+  <div class="topbar">
+    <button class="btn alt" onclick="toggleSidebar()">☰</button>
+    <button class="btn alt" onclick="toggleTheme()">🌗</button>
+  </div>
+  <input class="search" placeholder="Search scripts..." oninput="filter(this.value)">
+  <div class="filters">
+    <button class="btn alt" onclick="setCat('all')">All</button>
+    <button class="btn alt" onclick="setCat('audio')">Audio</button>
+    <button class="btn alt" onclick="setCat('network')">Network</button>
+    <button class="btn alt" onclick="setCat('system')">System</button>
+    <button class="btn alt" onclick="setCat('drivers')">Drivers</button>
+  </div>
+  <div id="list"></div>
+</div>
 
-    <aside>
-        <div class="brand">
-            <svg width="32" height="32" viewBox="0 0 512 512" fill="currentColor"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192zM256 0c141.4 0 256 114.6 256 256S397.4 512 256 512 0 397.4 0 256 114.6 0 256 0z"/></svg>
-            <span>FEDORA FIXES</span>
-        </div>
+<!-- MAIN -->
+<div class="main">
+  <div class="mobileTop">
+    <button class="btn alt" onclick="toggleSidebar()">☰ Files</button>
+    <button class="btn alt" onclick="toggleTheme()">🌗 Theme</button>
+  </div>
 
-        <div class="nav-group">
-            <span class="nav-label">Documentation</span>
-            <a href="#" class="nav-item active">🚀 <span>Quick Start</span></a>
-            <a href="#" class="nav-item">🛠 <span>Core Tweaks</span></a>
-            <a href="#" class="nav-item">📦 <span>DNF Optimization</span></a>
-        </div>
+  <h1>Fedora Fixes</h1>
+  <p>Instant downloads • Terminal vibe • Auto-scan repo • Mobile ready</p>
 
-        <div class="nav-group">
-            <span class="nav-label">Interface</span>
-            <a href="#" class="nav-item">🎨 <span>GNOME Theming</span></a>
-            <a href="#" class="nav-item">🔠 <span>Font Rendering</span></a>
-        </div>
-    </aside>
+  <div class="term" id="terminal"></div>
 
-    <main>
-        <header class="glass-panel">
-            <span class="tag">VERIFIED FOR FEDORA 39/40</span>
-            <h1>The Ultimate Fedora <br>Workstation Fixer</h1>
-            <p>A comprehensive, community-driven guide to patching, optimizing, and perfecting your Fedora installation for development and daily use.</p>
-            <button class="btn-primary">Get the Shell Script</button>
-        </header>
+  <h3>Usage</h3>
+  <pre>chmod +x script.sh
+./script.sh</pre>
 
-        <section class="grid">
-            <!-- Card 1 -->
-            <div class="glass-panel card">
-                <span class="tag">PERFORMANCE</span>
-                <h3>Speed up DNF</h3>
-                <p>Fedora's package manager is safe but slow by default. Enable parallel downloads and fastest mirrors.</p>
-                <div class="code-box">
-                    sudo nano /etc/dnf/dnf.conf<br>
-                    # Add: max_parallel_downloads=10
-                </div>
-            </div>
+  <footer style="opacity:.6;margin-top:2rem">
+    tarun922/fedora-fixes
+  </footer>
+</div>
 
-            <!-- Card 2 -->
-            <div class="glass-panel card">
-                <span class="tag">MULTIMEDIA</span>
-                <h3>Media Codecs</h3>
-                <p>Install essential codecs (H.264, AAC, etc.) that aren't included by default due to licensing.</p>
-                <div class="code-box">
-                    sudo dnf groupupdate core
-                </div>
-            </div>
+<script>
+/* ===== CONFIG ===== */
+const OWNER="tarun922";
+const REPO="fedora-fixes"; // used for auto-scan
 
-            <!-- Card 3 -->
-            <div class="glass-panel card">
-                <span class="tag">SYSTEM</span>
-                <h3>Battery Life (TLP)</h3>
-                <p>Significantly improve laptop battery life by installing TLP power management.</p>
-                <div class="code-box">
-                    sudo dnf install tlp tlp-rdw
-                </div>
-            </div>
-        </section>
+/* ===== LOCAL FALLBACK (used if API blocked) ===== */
+let scripts=[
+ {n:"main.sh",c:"system",d:"Main interactive console"},
+ {n:"Audio-Fix.sh",c:"audio",d:"Fix PipeWire & sound"},
+ {n:"Battery-Fix.sh",c:"system",d:"Battery & power tweaks"},
+ {n:"Display-Fix.sh",c:"system",d:"Screen & resolution fixes"},
+ {n:"Flatpak-Fix.sh",c:"system",d:"Flatpak repair"},
+ {n:"Input-Fix.sh",c:"system",d:"Keyboard/mouse lag"},
+ {n:"Nvidia-Fix.sh",c:"drivers",d:"NVIDIA drivers"},
+ {n:"Share-Fix.sh",c:"system",d:"Screen sharing"},
+ {n:"System-Refresh.sh",c:"system",d:"System repair"},
+ {n:"Update-Fix.sh",c:"system",d:"DNF update fix"},
+ {n:"fix-bluetooth.sh",c:"network",d:"Bluetooth fix"},
+ {n:"fix-wifi.sh",c:"network",d:"Wi-Fi fix"}
+];
 
-        <section class="glass-panel" style="margin-top: 10px;">
-            <h2>About this Project</h2>
-            <p style="margin-top: 15px; line-height: 1.7;">
-                Fedora Fixes was born out of the need for a central repository of post-installation steps. 
-                Instead of scouring Reddit and various forums, we've compiled the most critical updates 
-                to get your system running at 100% efficiency in minutes.
-            </p>
-        </section>
-    </main>
+let currentCat="all";
+
+/* ===== AUTO-SCAN REPO ===== */
+fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents`)
+ .then(r=>r.json()).then(data=>{
+   const sh=data.filter(f=>f.name.endsWith(".sh")).map(f=>({n:f.name,c:"system",d:"Auto-detected script"}));
+   if(sh.length) scripts=sh;
+   render();
+ }).catch(render);
+
+/* ===== RENDER ===== */
+function render(){
+ const box=document.getElementById("list"); box.innerHTML="";
+ scripts.filter(s=>currentCat=="all"||s.c==currentCat).forEach(s=>{
+  box.innerHTML+=`
+   <div class="file">
+    <div class="name">${s.n}</div>
+    <div class="desc">${s.d}</div>
+    <div class="row">
+      <a class="btn" href="${s.n}" download>Download</a>
+      <button class="btn alt" onclick="copy('chmod +x ${s.n}')">chmod</button>
+      <button class="btn alt" onclick="copy('./${s.n}')">run</button>
+    </div>
+   </div>`;
+ });
+}
+
+/* ===== HELPERS ===== */
+function copy(t){navigator.clipboard.writeText(t)}
+function filter(q){
+ q=q.toLowerCase();
+ document.querySelectorAll(".file").forEach(f=>{
+  f.style.display=f.innerText.toLowerCase().includes(q)?"":"none";
+ });
+}
+function setCat(c){currentCat=c;render()}
+function toggleSidebar(){document.getElementById("sidebar").classList.toggle("hidden")}
+function toggleTheme(){document.body.classList.toggle("light")}
+
+/* ===== TERMINAL ANIMATION ===== */
+const lines=[
+ "Initializing Fedora Fixes…",
+ "Scanning system vulnerabilities…",
+ "Loading emergency scripts…",
+ "Ready."
+];
+let i=0,j=0,term=document.getElementById("terminal");
+(function type(){
+ if(i<lines.length){
+  if(j<lines[i].length){
+   term.textContent+=lines[i][j++]; setTimeout(type,25);
+  }else{term.textContent+="\n"; i++; j=0; setTimeout(type,300);}
+ }
+})();
+render();
+</script>
 
 </body>
 </html>
