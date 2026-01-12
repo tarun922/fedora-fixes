@@ -6,167 +6,250 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root{
-  --bg:#0b0b12; --panel:#11111b; --txt:#eaeaf0; --accent:#6cf2c2; --accent2:#3cc1ff;
+:root {
+  --bg: #f3f4f7;
+  --glass: rgba(255,255,255,0.6);
+  --border: rgba(255,255,255,0.4);
+  --text: #1e1e1e;
+  --muted: #6b6b6b;
+  --accent: #8a8a8a;
 }
-.light{
-  --bg:#f5f7fb; --panel:#ffffff; --txt:#111; --accent:#0ea5a4; --accent2:#2563eb;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Segoe UI,system-ui;background:var(--bg);color:var(--txt);display:flex}
 
-/* SIDEBAR */
-.sidebar{
-  width:300px;background:var(--panel);border-right:1px solid #2a2a40;
-  padding:1rem;height:100vh;overflow:auto;transition:.3s
-}
-.sidebar.hidden{transform:translateX(-100%)}
-.topbar{display:flex;gap:.5rem;align-items:center}
-.btn{
-  border:none;border-radius:999px;padding:.35rem .7rem;font-size:.75rem;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#000;font-weight:700;cursor:pointer
-}
-.btn.alt{background:#2a2a40;color:var(--txt)}
-.search{width:100%;margin:.6rem 0;padding:.45rem;border-radius:6px;border:none;background:#1c1c2b;color:var(--txt)}
-.file{background:rgba(255,255,255,.05);padding:.55rem;border-radius:8px;margin-bottom:.45rem}
-.name{color:var(--accent);font-weight:700;font-size:.85rem}
-.desc{font-size:.72rem;opacity:.8;margin:.2rem 0}
-.row{display:flex;gap:.3rem;flex-wrap:wrap}
+* { box-sizing: border-box; }
 
-/* MAIN */
-.main{flex:1;padding:2rem}
-h1{color:var(--accent);font-size:3rem;margin:.2rem 0}
-.term{
-  background:#000;border-radius:10px;padding:1rem;margin:1rem 0;
-  font-family:monospace;color:#39ff14;min-height:90px
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: linear-gradient(135deg, #eceef2, #f9fafc);
+  color: var(--text);
+  min-height: 100vh;
 }
-.filters button{margin:.2rem}
 
-/* MOBILE */
-@media(max-width:900px){
-  .sidebar{position:fixed;z-index:10}
-  .mobileTop{display:flex;gap:.5rem;margin-bottom:.5rem}
+/* ---------- GLASS ---------- */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+/* ---------- LAYOUT ---------- */
+.wrapper {
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem;
+}
+
+header {
+  padding: 2.5rem;
+  animation: fadeUp 0.8s ease;
+}
+
+header h1 {
+  font-size: 3.2rem;
+  margin: 0;
+}
+
+header p {
+  max-width: 760px;
+  font-size: 1.1rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ---------- ACTION BAR ---------- */
+.actions {
+  margin-top: 1.5rem;
+}
+
+.actions a {
+  text-decoration: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: white;
+  color: var(--text);
+  font-size: 0.85rem;
+  margin-right: 0.4rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* ---------- TABS ---------- */
+.tabs {
+  margin-top: 2.5rem;
+}
+
+.tabs button {
+  border: none;
+  background: white;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+.tabs button.active {
+  background: #e5e5e5;
+}
+
+/* ---------- GRID ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.8rem;
+}
+
+.card {
+  padding: 1.4rem;
+  animation: fadeUp 0.7s ease;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0.6rem 0 0.8rem;
+}
+
+.badge {
+  font-size: 0.65rem;
+  background: #eaeaea;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  color: #333;
+}
+
+/* ---------- CARD ACTIONS ---------- */
+.card-actions a,
+.card-actions button {
+  font-size: 0.7rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  margin-right: 0.3rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 700px) {
+  header h1 { font-size: 2.5rem; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar hidden" id="sidebar">
-  <div class="topbar">
-    <button class="btn alt" onclick="toggleSidebar()">☰</button>
-    <button class="btn alt" onclick="toggleTheme()">🌗</button>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="glass">
+    <h1>Fedora Fixes</h1>
+    <p>
+      Fedora Fixes is a curated, minimal, and transparent collection of repair
+      and optimization scripts designed to solve real Fedora Linux issues.
+      Each script focuses on a single responsibility, follows best practices,
+      and can be downloaded instantly — no redirects, no clutter.
+    </p>
+
+    <div class="actions">
+      <a href="https://github.com/tarun922/fedora-fixes/archive/refs/heads/main.zip">
+        ⬇ Download All (ZIP)
+      </a>
+      <a href="https://github.com/tarun922/fedora-fixes">
+        ★ GitHub Repository
+      </a>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="active" onclick="filter('all')">All</button>
+    <button onclick="filter('audio')">Audio</button>
+    <button onclick="filter('network')">Network</button>
+    <button onclick="filter('system')">System</button>
+    <button onclick="filter('drivers')">Drivers</button>
   </div>
-  <input class="search" placeholder="Search scripts..." oninput="filter(this.value)">
-  <div class="filters">
-    <button class="btn alt" onclick="setCat('all')">All</button>
-    <button class="btn alt" onclick="setCat('audio')">Audio</button>
-    <button class="btn alt" onclick="setCat('network')">Network</button>
-    <button class="btn alt" onclick="setCat('system')">System</button>
-    <button class="btn alt" onclick="setCat('drivers')">Drivers</button>
-  </div>
-  <div id="list"></div>
-</div>
 
-<!-- MAIN -->
-<div class="main">
-  <div class="mobileTop">
-    <button class="btn alt" onclick="toggleSidebar()">☰ Files</button>
-    <button class="btn alt" onclick="toggleTheme()">🌗 Theme</button>
-  </div>
+  <!-- GRID -->
+  <div class="grid" id="grid"></div>
 
-  <h1>Fedora Fixes</h1>
-  <p>Instant downloads • Terminal vibe • Auto-scan repo • Mobile ready</p>
-
-  <div class="term" id="terminal"></div>
-
-  <h3>Usage</h3>
-  <pre>chmod +x script.sh
-./script.sh</pre>
-
-  <footer style="opacity:.6;margin-top:2rem">
-    tarun922/fedora-fixes
+  <footer>
+    Designed with clarity and restraint • tarun922 / fedora-fixes
   </footer>
+
 </div>
 
 <script>
-/* ===== CONFIG ===== */
-const OWNER="tarun922";
-const REPO="fedora-fixes"; // used for auto-scan
-
-/* ===== LOCAL FALLBACK (used if API blocked) ===== */
-let scripts=[
- {n:"main.sh",c:"system",d:"Main interactive console"},
- {n:"Audio-Fix.sh",c:"audio",d:"Fix PipeWire & sound"},
- {n:"Battery-Fix.sh",c:"system",d:"Battery & power tweaks"},
- {n:"Display-Fix.sh",c:"system",d:"Screen & resolution fixes"},
- {n:"Flatpak-Fix.sh",c:"system",d:"Flatpak repair"},
- {n:"Input-Fix.sh",c:"system",d:"Keyboard/mouse lag"},
- {n:"Nvidia-Fix.sh",c:"drivers",d:"NVIDIA drivers"},
- {n:"Share-Fix.sh",c:"system",d:"Screen sharing"},
- {n:"System-Refresh.sh",c:"system",d:"System repair"},
- {n:"Update-Fix.sh",c:"system",d:"DNF update fix"},
- {n:"fix-bluetooth.sh",c:"network",d:"Bluetooth fix"},
- {n:"fix-wifi.sh",c:"network",d:"Wi-Fi fix"}
+const scripts = [
+ {n:"main.sh", c:"system", i:"🧠", v:"v2.0", d:"Interactive control center that safely launches all available fixes from a single guided menu."},
+ {n:"Audio-Fix.sh", c:"audio", i:"🔊", v:"stable", d:"Repairs PipeWire, restores missing outputs, and resolves common sound device issues."},
+ {n:"Battery-Fix.sh", c:"system", i:"🔋", v:"stable", d:"Optimizes power settings to improve battery life and reduce unnecessary background drain."},
+ {n:"Display-Fix.sh", c:"system", i:"🖥️", v:"stable", d:"Fixes resolution scaling, screen tearing, and display detection issues."},
+ {n:"Flatpak-Fix.sh", c:"system", i:"📦", v:"stable", d:"Repairs broken Flatpak installations, permissions, and runtime mismatches."},
+ {n:"Input-Fix.sh", c:"system", i:"⌨️", v:"stable", d:"Reduces keyboard and mouse latency for smoother and more responsive input."},
+ {n:"Nvidia-Fix.sh", c:"drivers", i:"🧩", v:"tested", d:"Safely installs and repairs NVIDIA proprietary drivers using recommended Fedora methods."},
+ {n:"Share-Fix.sh", c:"system", i:"📺", v:"stable", d:"Fixes screen sharing issues across Wayland and X11 sessions."},
+ {n:"System-Refresh.sh", c:"system", i:"♻️", v:"stable", d:"Cleans caches and refreshes system state without affecting personal data."},
+ {n:"Update-Fix.sh", c:"system", i:"⬆️", v:"stable", d:"Fixes DNF update failures, repo conflicts, and metadata corruption."},
+ {n:"fix-bluetooth.sh", c:"network", i:"🔵", v:"stable", d:"Solves Bluetooth auto-disconnect, headset drops, and adapter issues."},
+ {n:"fix-wifi.sh", c:"network", i:"📶", v:"stable", d:"Fixes Wi-Fi driver issues, firmware loading problems, and random disconnects."}
 ];
 
-let currentCat="all";
+const grid = document.getElementById("grid");
 
-/* ===== AUTO-SCAN REPO ===== */
-fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents`)
- .then(r=>r.json()).then(data=>{
-   const sh=data.filter(f=>f.name.endsWith(".sh")).map(f=>({n:f.name,c:"system",d:"Auto-detected script"}));
-   if(sh.length) scripts=sh;
-   render();
- }).catch(render);
-
-/* ===== RENDER ===== */
-function render(){
- const box=document.getElementById("list"); box.innerHTML="";
- scripts.filter(s=>currentCat=="all"||s.c==currentCat).forEach(s=>{
-  box.innerHTML+=`
-   <div class="file">
-    <div class="name">${s.n}</div>
-    <div class="desc">${s.d}</div>
-    <div class="row">
-      <a class="btn" href="${s.n}" download>Download</a>
-      <button class="btn alt" onclick="copy('chmod +x ${s.n}')">chmod</button>
-      <button class="btn alt" onclick="copy('./${s.n}')">run</button>
-    </div>
-   </div>`;
- });
+function render(list) {
+  grid.innerHTML = "";
+  list.forEach(s => {
+    grid.innerHTML += `
+      <div class="card glass">
+        <h3>${s.i} ${s.n} <span class="badge">${s.v}</span></h3>
+        <p>${s.d}</p>
+        <div class="card-actions">
+          <a href="${s.n}" download>Download</a>
+          <button onclick="copy('chmod +x ${s.n}')">chmod</button>
+          <button onclick="copy('./${s.n}')">run</button>
+        </div>
+      </div>`;
+  });
 }
 
-/* ===== HELPERS ===== */
-function copy(t){navigator.clipboard.writeText(t)}
-function filter(q){
- q=q.toLowerCase();
- document.querySelectorAll(".file").forEach(f=>{
-  f.style.display=f.innerText.toLowerCase().includes(q)?"":"none";
- });
+function filter(cat) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  render(cat === "all" ? scripts : scripts.filter(s => s.c === cat));
 }
-function setCat(c){currentCat=c;render()}
-function toggleSidebar(){document.getElementById("sidebar").classList.toggle("hidden")}
-function toggleTheme(){document.body.classList.toggle("light")}
 
-/* ===== TERMINAL ANIMATION ===== */
-const lines=[
- "Initializing Fedora Fixes…",
- "Scanning system vulnerabilities…",
- "Loading emergency scripts…",
- "Ready."
-];
-let i=0,j=0,term=document.getElementById("terminal");
-(function type(){
- if(i<lines.length){
-  if(j<lines[i].length){
-   term.textContent+=lines[i][j++]; setTimeout(type,25);
-  }else{term.textContent+="\n"; i++; j=0; setTimeout(type,300);}
- }
-})();
-render();
+function copy(text) {
+  navigator.clipboard.writeText(text);
+}
+
+render(scripts);
 </script>
 
 </body>
