@@ -654,6 +654,164 @@ footer {
       </div>
       <div class="form-actions">
         <button type="submit" class="btn-primary">Login</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal" id="signupModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('signupModal')">&times;</span>
+    <h2>Sign Up</h2>
+    <div id="signupMessage"></div>
+    <form onsubmit="handleSignup(event)">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signupEmail" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPassword" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="signupPasswordConfirm" required minlength="6">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Sign Up</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('signupModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- AI Chat Modal -->
+<div class="modal" id="aiChatModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('aiChatModal')">&times;</span>
+    <h2>✨ AI Assistant - Fedora Help</h2>
+    <div class="chat-container" id="chatContainer">
+      <div class="chat-message ai">
+        <strong>AI Assistant</strong>
+        <div>Hello! I'm here to help you with Fedora Linux issues. Ask me anything about fixing problems, optimizing your system, or which script to use!</div>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chatInput" placeholder="Ask about Fedora issues..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button class="btn-primary" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal" id="feedbackModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('feedbackModal')">&times;</span>
+    <h2>Share Feedback</h2>
+    <div id="feedbackMessage"></div>
+    <form onsubmit="handleFeedback(event)">
+      <div class="form-group">
+        <label>Type</label>
+        <select id="feedbackType" required>
+          <option value="">Select type...</option>
+          <option value="bug">Bug Report</option>
+          <option value="feature">Feature Request</option>
+          <option value="improvement">Improvement</option>
+          <option value="general">General Feedback</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" id="feedbackSubject" required>
+      </div>
+      <div class="form-group">
+        <label>Details</label>
+        <textarea id="feedbackDetails" required></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Submit</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('feedbackModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Problem Report Modal -->
+<div class="modal" id="problemModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('problemModal')">&times;</span>
+    <h2>Report a Problem</h2>
+    <div id="problemMessage"></div>
+    <form onsubmit="handleProblem(event)">
+      <div class="form-group">
+        <label>Problem Category</label>
+        <select id="problemCategory" required>
+          <option value="">Select category...</option>
+          <option value="audio">Audio</option>
+          <option value="network">Network</option>
+          <option value="system">System</option>
+          <option value="drivers">Drivers</option>
+          <option value="display">Display</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Problem Title</label>
+        <input type="text" id="problemTitle" required>
+      </div>
+      <div class="form-group">
+        <label>Fedora Version</label>
+        <input type="text" id="problemVersion" placeholder="e.g., Fedora 39">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="problemDescription" required placeholder="Describe your problem in detail..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Submit</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('problemModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Contribute Fix Modal -->
+<div class="modal" id="contributeModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('contributeModal')">&times;</span>
+    <h2>Contribute a Fix</h2>
+    <div id="contributeMessage"></div>
+    <form onsubmit="handleContribute(event)">
+      <div class="form-group">
+        <label>Fix Name</label>
+        <input type="text" id="contributeName" required placeholder="e.g., GPU-Fix.sh">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="contributeCategory" required>
+          <option value="">Select category...</option>
+          <option value="audio">Audio</option>
+          <option value="network">Network</option>
+          <option value="system">System</option>
+          <option value="drivers">Drivers</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="contributeDescription" required placeholder="What does this fix do?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Script Content or GitHub Link</label>
+        <textarea id="contributeScript" required placeholder="Paste your script or provide a link to it..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tested On (Fedora Version)</label>
+        <input type="text" id="contributeTested" placeholder="e.g., Fedora 39, 40">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Submit</button>
         <button type="button" class="btn-secondary" onclick="closeModal('contributeModal')">Cancel</button>
       </div>
     </form>
@@ -799,16 +957,17 @@ window.sendMessage = async () => {
   
   try {
     // Call OpenRouter API
+    const apiKey = process.env.KEY;
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_OPENROUTER_API_KEY_HERE',
+        'Authorization': 'Bearer ${apikey}',
         'HTTP-Referer': window.location.href,
         'X-Title': 'Fedora Fixes'
       },
       body: JSON.stringify({
-        model: 'z-ai/glm-4.5-air:free',
+        model: 'mistralai/devstral-2512:free',
         messages: [
           {
             role: 'system',
@@ -1006,162 +1165,4 @@ document.querySelectorAll('.modal').forEach(modal => {
 </script>
 
 </body>
-</html>="btn-secondary" onclick="closeModal('loginModal')">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Signup Modal -->
-<div class="modal" id="signupModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('signupModal')">&times;</span>
-    <h2>Sign Up</h2>
-    <div id="signupMessage"></div>
-    <form onsubmit="handleSignup(event)">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="signupEmail" required>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="signupPassword" required minlength="6">
-      </div>
-      <div class="form-group">
-        <label>Confirm Password</label>
-        <input type="password" id="signupPasswordConfirm" required minlength="6">
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn-primary">Sign Up</button>
-        <button type="button" class="btn-secondary" onclick="closeModal('signupModal')">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- AI Chat Modal -->
-<div class="modal" id="aiChatModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('aiChatModal')">&times;</span>
-    <h2>✨ AI Assistant - Fedora Help</h2>
-    <div class="chat-container" id="chatContainer">
-      <div class="chat-message ai">
-        <strong>AI Assistant</strong>
-        <div>Hello! I'm here to help you with Fedora Linux issues. Ask me anything about fixing problems, optimizing your system, or which script to use!</div>
-      </div>
-    </div>
-    <div class="chat-input-container">
-      <input type="text" id="chatInput" placeholder="Ask about Fedora issues..." onkeypress="if(event.key==='Enter') sendMessage()">
-      <button class="btn-primary" onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-</div>
-
-<!-- Feedback Modal -->
-<div class="modal" id="feedbackModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('feedbackModal')">&times;</span>
-    <h2>Share Feedback</h2>
-    <div id="feedbackMessage"></div>
-    <form onsubmit="handleFeedback(event)">
-      <div class="form-group">
-        <label>Type</label>
-        <select id="feedbackType" required>
-          <option value="">Select type...</option>
-          <option value="bug">Bug Report</option>
-          <option value="feature">Feature Request</option>
-          <option value="improvement">Improvement</option>
-          <option value="general">General Feedback</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Subject</label>
-        <input type="text" id="feedbackSubject" required>
-      </div>
-      <div class="form-group">
-        <label>Details</label>
-        <textarea id="feedbackDetails" required></textarea>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn-primary">Submit</button>
-        <button type="button" class="btn-secondary" onclick="closeModal('feedbackModal')">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Problem Report Modal -->
-<div class="modal" id="problemModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('problemModal')">&times;</span>
-    <h2>Report a Problem</h2>
-    <div id="problemMessage"></div>
-    <form onsubmit="handleProblem(event)">
-      <div class="form-group">
-        <label>Problem Category</label>
-        <select id="problemCategory" required>
-          <option value="">Select category...</option>
-          <option value="audio">Audio</option>
-          <option value="network">Network</option>
-          <option value="system">System</option>
-          <option value="drivers">Drivers</option>
-          <option value="display">Display</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Problem Title</label>
-        <input type="text" id="problemTitle" required>
-      </div>
-      <div class="form-group">
-        <label>Fedora Version</label>
-        <input type="text" id="problemVersion" placeholder="e.g., Fedora 39">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="problemDescription" required placeholder="Describe your problem in detail..."></textarea>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn-primary">Submit</button>
-        <button type="button" class="btn-secondary" onclick="closeModal('problemModal')">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Contribute Fix Modal -->
-<div class="modal" id="contributeModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('contributeModal')">&times;</span>
-    <h2>Contribute a Fix</h2>
-    <div id="contributeMessage"></div>
-    <form onsubmit="handleContribute(event)">
-      <div class="form-group">
-        <label>Fix Name</label>
-        <input type="text" id="contributeName" required placeholder="e.g., GPU-Fix.sh">
-      </div>
-      <div class="form-group">
-        <label>Category</label>
-        <select id="contributeCategory" required>
-          <option value="">Select category...</option>
-          <option value="audio">Audio</option>
-          <option value="network">Network</option>
-          <option value="system">System</option>
-          <option value="drivers">Drivers</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="contributeDescription" required placeholder="What does this fix do?"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Script Content or GitHub Link</label>
-        <textarea id="contributeScript" required placeholder="Paste your script or provide a link to it..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>Tested On (Fedora Version)</label>
-        <input type="text" id="contributeTested" placeholder="e.g., Fedora 39, 40">
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn-primary">Submit</button>
-        <button type="button" class
+</html>
