@@ -957,12 +957,12 @@ window.sendMessage = async () => {
   
   try {
     // Call OpenRouter API
-    const apiKey = process.env.KEY;
+   
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apikey}`,
+        'Authorization': 'Bearer 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',
         'HTTP-Referer': window.location.href,
         'X-Title': 'Fedora Fixes'
       },
