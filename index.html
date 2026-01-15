@@ -916,34 +916,57 @@ window.sendMessage = async () => {
   container.appendChild(loadingDiv);
   container.scrollTop = container.scrollHeight;
   
-  try {
-    const messages = [
-      {
-        role: 'system',
-        content: 'You are a helpful AI assistant specializing in Fedora Linux. Help users solve their Fedora issues, recommend appropriate fix scripts from the Fedora Fixes collection (Audio-Fix.sh, Battery-Fix.sh, Display-Fix.sh, Flatpak-Fix.sh, Input-Fix.sh, Nvidia-Fix.sh, Share-Fix.sh, System-Refresh.sh, Update-Fix.sh, fix-bluetooth.sh, fix-wifi.sh), and provide technical guidance. Be concise, practical, and friendly.'
-      },
-      ...window.currentChatSession
-    ];
-    
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messages })
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || `API request failed: ${response.status}`);
+  // List of free models to try in order
+  const freeModels = [
+    'meta-llama/llama-3.2-3b-instruct:free',
+    'google/gemini-2.0-flash-exp:free',
+    'mistralai/mistral-7b-instruct:free',
+    'qwen/qwen-2-7b-instruct:free'
+  ];
+  
+  let success = false;
+  let aiMessage = '';
+  
+  for (const model of freeModels) {
+    try {
+      const messages = [
+        {
+          role: 'system',
+          content: 'You are a helpful AI assistant specializing in Fedora Linux. Help users solve their Fedora issues, recommend appropriate fix scripts from the Fedora Fixes collection (Audio-Fix.sh, Battery-Fix.sh, Display-Fix.sh, Flatpak-Fix.sh, Input-Fix.sh, Nvidia-Fix.sh, Share-Fix.sh, System-Refresh.sh, Update-Fix.sh, fix-bluetooth.sh, fix-wifi.sh), and provide technical guidance. Be concise, practical, and friendly.'
+        },
+        ...window.currentChatSession
+      ];
+      
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages, model })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        aiMessage = data.message || 'Sorry, I could not generate a response.';
+        success = true;
+        break;
+      } else if (data.error && !data.error.includes('429')) {
+        // If it's not a rate limit error, don't try other models
+        throw new Error(data.error);
+      }
+      // If 429, continue to next model
+      
+    } catch (error) {
+      console.log(`Model ${model} failed:`, error.message);
+      // Continue to next model
     }
-    
-    const aiMessage = data.message || 'Sorry, I could not generate a response.';
-    
-    const loading = document.getElementById('aiLoading');
-    if (loading) loading.remove();
-    
+  }
+  
+  const loading = document.getElementById('aiLoading');
+  if (loading) loading.remove();
+  
+  if (success) {
     const aiMsgDiv = document.createElement('div');
     aiMsgDiv.className = 'chat-message ai';
     aiMsgDiv.innerHTML = `<strong>AI Assistant</strong><div>${escapeHtml(aiMessage)}</div>`;
@@ -969,17 +992,12 @@ window.sendMessage = async () => {
         console.error('Error saving to database:', dbError);
       }
     }
-    
-  } catch (error) {
-    const loading = document.getElementById('aiLoading');
-    if (loading) loading.remove();
-    
+  } else {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'chat-message ai';
-    errorDiv.innerHTML = `<strong>AI Assistant</strong><div>Error: ${escapeHtml(error.message)}. <br><br>Troubleshooting:<br>1. Check Vercel logs<br>2. Verify OPENROUTER_API_KEY is set<br>3. Redeploy after adding environment variable</div>`;
+    errorDiv.innerHTML = `<strong>AI Assistant</strong><div>All free AI models are currently rate-limited. Please try again in a few minutes, or consider adding your own OpenRouter API key with credits for unlimited access: <a href="https://openrouter.ai/settings/keys" target="_blank" style="color: #4a90e2; text-decoration: underline;">Get API Key</a></div>`;
     container.appendChild(errorDiv);
     container.scrollTop = container.scrollHeight;
-    console.error('Full error:', error);
   }
 };
 
