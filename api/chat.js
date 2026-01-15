@@ -1,4 +1,4 @@
-// api/chat.js - Updated with model fallback support
+// api/chat.js - With user context and chat history support
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const { messages, model } = req.body;
+    const { messages, model, userId, userEmail } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -39,10 +39,14 @@ export default async function handler(req, res) {
       });
     }
 
+    // Log user interaction
+    console.log(`AI Chat Request from: ${userEmail || 'anonymous'} (${userId || 'no-id'})`);
+    console.log(`Message count: ${messages.length}`);
+
     // Use provided model or default
     const selectedModel = model || 'meta-llama/llama-3.2-3b-instruct:free';
 
-    console.log(`Calling OpenRouter with model: ${selectedModel}`);
+    console.log(`Using model: ${selectedModel}`);
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -61,10 +65,9 @@ export default async function handler(req, res) {
     });
 
     const responseText = await response.text();
-    console.log('Response status:', response.status);
 
     if (!response.ok) {
-      console.error('OpenRouter error:', responseText);
+      console.error(`Model ${selectedModel} failed:`, responseText);
       return res.status(response.status).json({ 
         error: `OpenRouter API error: ${response.status} - ${responseText}`,
         success: false 
@@ -74,7 +77,7 @@ export default async function handler(req, res) {
     const data = JSON.parse(responseText);
     const aiMessage = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
 
-    console.log('Success with model:', selectedModel);
+    console.log(`Success! Response length: ${aiMessage.length} chars`);
 
     return res.status(200).json({ 
       message: aiMessage,
