@@ -651,7 +651,15 @@ footer {
     <div class="chat-container" id="chatContainer">
       <div class="chat-message ai">
         <strong>AI Assistant</strong>
-        <div>Hello! I'm here to help you with Fedora Linux issues. Ask me anything about fixing problems, optimizing your system, or which script to use!</div>
+        <div>Hello! I'm the Fedora Fixes AI Assistant. I'm here to help you solve Fedora Linux problems and recommend the right fix scripts for your issues.
+        
+        <br><br><strong>I can help you with:</strong>
+        <br>• Diagnosing audio, network, display, and system issues
+        <br>• Recommending the appropriate fix script
+        <br>• Providing step-by-step installation and usage instructions
+        <br>• Technical guidance for Fedora Linux
+        
+        <br><br>💡 <strong>Note:</strong> You need to be logged in to chat with me. This allows me to remember our conversation and provide better personalized support!</div>
       </div>
     </div>
     <div class="chat-input-container">
@@ -894,6 +902,17 @@ window.sendMessage = async () => {
   
   if (!message) return;
   
+  // Check if user is logged in
+  if (!window.currentUser) {
+    const container = document.getElementById('chatContainer');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'chat-message ai';
+    errorDiv.innerHTML = `<strong>AI Assistant</strong><div>Please <a href="#" onclick="closeModal('aiChatModal'); showModal('loginModal'); return false;" style="color: #4a90e2; text-decoration: underline;">login</a> or <a href="#" onclick="closeModal('aiChatModal'); showModal('signupModal'); return false;" style="color: #4a90e2; text-decoration: underline;">sign up</a> to chat with the AI assistant. This helps us provide you with personalized support and save your chat history.</div>`;
+    container.appendChild(errorDiv);
+    container.scrollTop = container.scrollHeight;
+    return;
+  }
+  
   const container = document.getElementById('chatContainer');
   
   const userMsgDiv = document.createElement('div');
@@ -929,11 +948,54 @@ window.sendMessage = async () => {
   
   for (const model of freeModels) {
     try {
+      // Build context-aware system message
+      const systemMessage = `You are the AI Assistant for Fedora Fixes (fedora-fixes.org), a curated collection of repair and optimization scripts for Fedora Linux.
+
+YOUR PURPOSE:
+- Help users diagnose and fix Fedora Linux issues
+- Recommend the appropriate fix scripts from the Fedora Fixes collection
+- Provide step-by-step guidance for using the scripts
+- Answer technical questions about Fedora
+
+AVAILABLE FIX SCRIPTS:
+1. Audio-Fix.sh - Repairs PipeWire, restores missing outputs, resolves sound device issues
+2. Battery-Fix.sh - Optimizes power settings, improves battery life
+3. Display-Fix.sh - Fixes resolution scaling, screen tearing, display detection
+4. Flatpak-Fix.sh - Repairs broken Flatpak installations, permissions, runtimes
+5. Input-Fix.sh - Reduces keyboard/mouse latency for responsive input
+6. Nvidia-Fix.sh - Installs and repairs NVIDIA proprietary drivers
+7. Share-Fix.sh - Fixes screen sharing on Wayland and X11
+8. System-Refresh.sh - Cleans caches, refreshes system state
+9. Update-Fix.sh - Fixes DNF update failures, repo conflicts
+10. fix-bluetooth.sh - Solves Bluetooth disconnects, headset drops
+11. fix-wifi.sh - Fixes Wi-Fi driver issues, firmware loading
+12. main.sh - Interactive control center for all fixes
+
+INSTRUCTIONS:
+- When users describe a problem, identify which script(s) would help
+- Provide download commands: wget https://fedora-fixes.org/[script-name]
+- Give clear usage instructions: chmod +x [script-name] && sudo ./[script-name]
+- Be concise, practical, and friendly
+- Reference the user's previous questions in this conversation when relevant
+
+USER: ${window.currentUser.email}`;
+
+      // Include recent chat history from Firestore for context
+      let chatContext = [];
+      if (window.chatHistory.length > 0) {
+        const recentHistory = window.chatHistory.slice(0, 5).reverse();
+        chatContext = recentHistory.flatMap(chat => [
+          { role: 'user', content: chat.userMessage },
+          { role: 'assistant', content: chat.aiResponse }
+        ]);
+      }
+      
       const messages = [
         {
           role: 'system',
-          content: 'You are a helpful AI assistant specializing in Fedora Linux. Help users solve their Fedora issues, recommend appropriate fix scripts from the Fedora Fixes collection (Audio-Fix.sh, Battery-Fix.sh, Display-Fix.sh, Flatpak-Fix.sh, Input-Fix.sh, Nvidia-Fix.sh, Share-Fix.sh, System-Refresh.sh, Update-Fix.sh, fix-bluetooth.sh, fix-wifi.sh), and provide technical guidance. Be concise, practical, and friendly.'
+          content: systemMessage
         },
+        ...chatContext,
         ...window.currentChatSession
       ];
       
@@ -942,7 +1004,12 @@ window.sendMessage = async () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages, model })
+        body: JSON.stringify({ 
+          messages, 
+          model,
+          userId: window.currentUser.uid,
+          userEmail: window.currentUser.email
+        })
       });
       
       const data = await response.json();
@@ -952,14 +1019,11 @@ window.sendMessage = async () => {
         success = true;
         break;
       } else if (data.error && !data.error.includes('429')) {
-        // If it's not a rate limit error, don't try other models
         throw new Error(data.error);
       }
-      // If 429, continue to next model
       
     } catch (error) {
       console.log(`Model ${model} failed:`, error.message);
-      // Continue to next model
     }
   }
   
@@ -979,18 +1043,20 @@ window.sendMessage = async () => {
     
     container.scrollTop = container.scrollHeight;
     
-    if (window.currentUser) {
-      try {
-        await addDoc(collection(db, 'chats'), {
-          userId: window.currentUser.uid,
-          userEmail: window.currentUser.email,
-          userMessage: message,
-          aiResponse: aiMessage,
-          timestamp: serverTimestamp()
-        });
-      } catch (dbError) {
-        console.error('Error saving to database:', dbError);
-      }
+    // Save to Firestore
+    try {
+      await addDoc(collection(db, 'chats'), {
+        userId: window.currentUser.uid,
+        userEmail: window.currentUser.email,
+        userMessage: message,
+        aiResponse: aiMessage,
+        timestamp: serverTimestamp()
+      });
+      
+      // Reload chat history to include new message
+      await loadChatHistory(window.currentUser.uid);
+    } catch (dbError) {
+      console.error('Error saving to database:', dbError);
     }
   } else {
     const errorDiv = document.createElement('div');
@@ -1132,8 +1198,38 @@ function copy(text) {
 
 function showModal(id) {
   document.getElementById(id).classList.add('active');
+  
+  // Reset chat session and load history when opening AI chat
   if (id === 'aiChatModal') {
     window.currentChatSession = [];
+    
+    // Load previous chat messages if user is logged in
+    if (window.currentUser && window.chatHistory.length > 0) {
+      const container = document.getElementById('chatContainer');
+      
+      // Clear container except welcome message
+      const welcomeMsg = container.querySelector('.chat-message.ai');
+      container.innerHTML = '';
+      if (welcomeMsg) {
+        container.appendChild(welcomeMsg);
+      }
+      
+      // Display last 5 messages from history
+      const recentChats = window.chatHistory.slice(0, 5).reverse();
+      recentChats.forEach(chat => {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'chat-message user';
+        userDiv.innerHTML = `<strong>You</strong><div>${escapeHtml(chat.userMessage)}</div>`;
+        container.appendChild(userDiv);
+        
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'chat-message ai';
+        aiDiv.innerHTML = `<strong>AI Assistant</strong><div>${escapeHtml(chat.aiResponse)}</div>`;
+        container.appendChild(aiDiv);
+      });
+      
+      container.scrollTop = container.scrollHeight;
+    }
   }
 }
 
