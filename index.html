@@ -515,6 +515,33 @@ footer {
   color: var(--muted);
 }
 
+.chat-message code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.chat-message pre {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  border-left: 3px solid #4a90e2;
+}
+
+.chat-message pre code {
+  display: block;
+  color: #2a2a2a;
+}
+
+.chat-message a {
+  color: #4a90e2;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.chat-message a:hover {
+  color: #357abd;
+}
+
 .chat-input-container {
   display: flex;
   gap: 0.6rem;
@@ -1033,7 +1060,7 @@ USER: ${window.currentUser.email}`;
   if (success) {
     const aiMsgDiv = document.createElement('div');
     aiMsgDiv.className = 'chat-message ai';
-    aiMsgDiv.innerHTML = `<strong>AI Assistant</strong><div>${escapeHtml(aiMessage)}</div>`;
+    aiMsgDiv.innerHTML = `<strong>AI Assistant</strong><div>${formatAiMessage(aiMessage)}</div>`;
     container.appendChild(aiMsgDiv);
     
     window.currentChatSession.push({
@@ -1071,6 +1098,37 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function formatAiMessage(text) {
+  // Convert markdown-style formatting to HTML
+  let formatted = text;
+  
+  // Code blocks with ```
+  formatted = formatted.replace(/```(\w+)?\n([\s\S]+?)```/g, (match, lang, code) => {
+    return `<pre style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 0.5rem 0;"><code>${escapeHtml(code.trim())}</code></pre>`;
+  });
+  
+  // Inline code with `
+  formatted = formatted.replace(/`([^`]+)`/g, '<code style="background: rgba(0,0,0,0.08); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>');
+  
+  // Bold text with **
+  formatted = formatted.replace(/\*\*([^\*]+)\*\*/g, '<strong style="font-weight: 700; color: #2a2a2a;">$1</strong>');
+  
+  // Numbered lists
+  formatted = formatted.replace(/^(\d+)\.\s+(.+)$/gm, '<div style="margin: 0.3rem 0; padding-left: 1.5rem;"><strong style="color: #4a90e2;">$1.</strong> $2</div>');
+  
+  // Bullet points with - or *
+  formatted = formatted.replace(/^[\-\*]\s+(.+)$/gm, '<div style="margin: 0.3rem 0; padding-left: 1.5rem;">• $1</div>');
+  
+  // Line breaks
+  formatted = formatted.replace(/\n\n/g, '<br><br>');
+  formatted = formatted.replace(/\n/g, '<br>');
+  
+  // Links
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" style="color: #4a90e2; text-decoration: underline;">$1</a>');
+  
+  return formatted;
 }
 
 window.handleFeedback = async (e) => {
@@ -1224,7 +1282,7 @@ function showModal(id) {
         
         const aiDiv = document.createElement('div');
         aiDiv.className = 'chat-message ai';
-        aiDiv.innerHTML = `<strong>AI Assistant</strong><div>${escapeHtml(chat.aiResponse)}</div>`;
+        aiDiv.innerHTML = `<strong>AI Assistant</strong><div>${formatAiMessage(chat.aiResponse)}</div>`;
         container.appendChild(aiDiv);
       });
       
