@@ -933,11 +933,12 @@ window.sendMessage = async () => {
       body: JSON.stringify({ messages })
     });
     
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`);
+    const data = await response.json();
+    
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || `API request failed: ${response.status}`);
     }
     
-    const data = await response.json();
     const aiMessage = data.message || 'Sorry, I could not generate a response.';
     
     const loading = document.getElementById('aiLoading');
@@ -975,9 +976,10 @@ window.sendMessage = async () => {
     
     const errorDiv = document.createElement('div');
     errorDiv.className = 'chat-message ai';
-    errorDiv.innerHTML = `<strong>AI Assistant</strong><div>Sorry, there was an error: ${escapeHtml(error.message)}. Please try again.</div>`;
+    errorDiv.innerHTML = `<strong>AI Assistant</strong><div>Error: ${escapeHtml(error.message)}. <br><br>Troubleshooting:<br>1. Check Vercel logs<br>2. Verify OPENROUTER_API_KEY is set<br>3. Redeploy after adding environment variable</div>`;
     container.appendChild(errorDiv);
     container.scrollTop = container.scrollHeight;
+    console.error('Full error:', error);
   }
 };
 
