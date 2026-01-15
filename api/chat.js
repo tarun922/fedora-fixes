@@ -1,7 +1,6 @@
-// api/chat.js - Vercel Serverless Function
+// api/chat.js - Updated with model fallback support
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -10,13 +9,11 @@ export default async function handler(req, res) {
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
   );
 
-  // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ 
       error: 'Method not allowed',
@@ -25,16 +22,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check if API key exists
     if (!process.env.OPENROUTER_API_KEY) {
-      console.error('OPENROUTER_API_KEY environment variable is not set');
+      console.error('OPENROUTER_API_KEY not set');
       return res.status(500).json({ 
-        error: 'API key not configured. Please set OPENROUTER_API_KEY in Vercel environment variables.',
+        error: 'API key not configured',
         success: false 
       });
     }
 
-    const { messages } = req.body;
+    const { messages, model } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ 
@@ -43,9 +39,11 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('Calling OpenRouter API...');
+    // Use provided model or default
+    const selectedModel = model || 'meta-llama/llama-3.2-3b-instruct:free';
 
-    // Call OpenRouter API
+    console.log(`Calling OpenRouter with model: ${selectedModel}`);
+
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -55,7 +53,7 @@ export default async function handler(req, res) {
         'X-Title': 'Fedora Fixes AI Assistant'
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free',
+        model: selectedModel,
         messages: messages,
         temperature: 0.7,
         max_tokens: 1500
@@ -63,10 +61,10 @@ export default async function handler(req, res) {
     });
 
     const responseText = await response.text();
-    console.log('OpenRouter response status:', response.status);
+    console.log('Response status:', response.status);
 
     if (!response.ok) {
-      console.error('OpenRouter API error:', responseText);
+      console.error('OpenRouter error:', responseText);
       return res.status(response.status).json({ 
         error: `OpenRouter API error: ${response.status} - ${responseText}`,
         success: false 
@@ -76,19 +74,19 @@ export default async function handler(req, res) {
     const data = JSON.parse(responseText);
     const aiMessage = data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.';
 
-    console.log('AI response generated successfully');
+    console.log('Success with model:', selectedModel);
 
     return res.status(200).json({ 
       message: aiMessage,
-      success: true 
+      success: true,
+      model: selectedModel
     });
 
   } catch (error) {
     console.error('Server error:', error);
     return res.status(500).json({ 
       error: `Server error: ${error.message}`,
-      success: false,
-      details: error.stack
+      success: false
     });
   }
 }
